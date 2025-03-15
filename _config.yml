@@ -6,7 +6,8 @@ author:
 # The `>` after `description:` means to ignore line-breaks until next key.
 # If you want to omit the line-break after the end of text, use `>-` instead.
 description: >
-  "Unlock the World of Molecules and Data: Dive into Chemistry from Your Laptop."
+  "Unlock the World of Molecules and Data:
+  Dive into the Chemistry from Your Laptop."
 
 # Build settings
 
@@ -46,7 +47,7 @@ minima:
   # Minima date format.
   # The default value is "%b %d, %Y" (e.g. Nov 14, 2023) 
   # Refer to https://shopify.github.io/liquid/filters/date/ if you want to customize this.
-  date_format: "%b-%d-%Y"
+  # date_format: "%b-%d-%Y"
 
   # Social Media Links
   # Renders icons via Font Awesome Free webfonts CDN, based on ordered list of entries.
