@@ -1,14 +1,12 @@
-title: Your awesome title
+title: Laptop Chemistry
 author:
-  name: GitHub User
-  email: your-email@domain.com
+  name: Laptop Chemistry
+  email: laptopchemistry@gmail.com
 
 # The `>` after `description:` means to ignore line-breaks until next key.
 # If you want to omit the line-break after the end of text, use `>-` instead.
 description: >
-  Write an awesome description for your new site here. You can edit this line
-  in _config.yml. It will appear in your document head meta (for Google search
-  results) and in your feed.xml site description.
+  "Unlock the World of Molecules and Data: Dive into Chemistry from Your Laptop."
 
 # Build settings
 
@@ -34,7 +32,7 @@ minima:
   # solarized-light	   Light variant of solarized color scheme.
   # solarized-dark	   Dark variant of solarized color scheme.
   # solarized	         Adaptive skin for solarized color scheme skins.
-  skin: classic
+  skin: auto
 
   # If you want to link only specific pages in the site-navigation, use this and list
   # the `path` property (as represented via Liquid) of the pages in the order they should
@@ -48,7 +46,7 @@ minima:
   # Minima date format.
   # The default value is "%b %d, %Y" (e.g. Nov 14, 2023) 
   # Refer to https://shopify.github.io/liquid/filters/date/ if you want to customize this.
-  #date_format: "%b-%d-%Y"
+  date_format: "%b-%d-%Y"
 
   # Social Media Links
   # Renders icons via Font Awesome Free webfonts CDN, based on ordered list of entries.
