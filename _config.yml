@@ -45,6 +45,10 @@ webmaster_verifications:
   # baidu: 
   # facebook: 
 
+# Include
+include:
+  - favicon.ico
+
 # Site Collections
 collections:
   methods:
