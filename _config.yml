@@ -31,9 +31,19 @@ description: >
 # add a line comment on "theme: minima" above.
 remote_theme: jekyll/minima@593a05a
 
+# Plugins
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
+
+# Web Verification
+webmaster_verifications:
+  google: 22adf0f0c4ae7864
+  # bing: 
+  # alexa: 
+  # yandex: 
+  # baidu: 
+  # facebook: 
 
 # Site Collections
 collections:
