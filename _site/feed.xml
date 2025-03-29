@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2025-03-27T19:56:56-04:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Laptop Chemistry</title><subtitle>&quot;Unlock the World of Molecules and Data: Dive into the Chemistry from Your Laptop.&quot;
+</subtitle><author><name>Laptop Chemistry</name><email>laptopchemistry@gmail.com</email></author><entry><title type="html">Welcome to Laptop Chemistry</title><link href="http://localhost:4000/2025/03/23/welcome-to-laptop-chemistry.html" rel="alternate" type="text/html" title="Welcome to Laptop Chemistry" /><published>2025-03-23T00:00:00-04:00</published><updated>2025-03-23T00:00:00-04:00</updated><id>http://localhost:4000/2025/03/23/welcome-to-laptop-chemistry</id><content type="html" xml:base="http://localhost:4000/2025/03/23/welcome-to-laptop-chemistry.html"><![CDATA[<h1 id="welcome-to-laptop-chemistry">Welcome to Laptop Chemistry</h1>
+
+<h2 id="exploring-the-digital-frontier-of-drug-discovery">Exploring the Digital Frontier of Drug Discovery</h2>
+
+<p>Thank you for visiting my blog dedicated to computational chemistry and cheminformatics. This blog represents my journey through the fascinating intersection of chemistry, biology, and computer science that’s transforming how we discover and develop new medicines.</p>
+
+<h3 id="why-this-blog-exists">Why This Blog Exists</h3>
+
+<p>The landscape of drug discovery has changed dramatically in recent decades. What once required massive laboratories, expensive equipment, and large teams can now, in many aspects, be explored from a simple laptop. As computing power has increased and software has become more accessible, the democratization of computational chemistry has opened doors for independent researchers, students, and curious minds everywhere.</p>
+
+<p>Here, I’ll be sharing topics in computational medicinal chemistry that I find particularly interesting and, importantly, that can be approached with resources available to most individuals with a laptop and internet connection. No supercomputers or specialized hardware required!</p>
+
+<h3 id="what-youll-find-here">What You’ll Find Here</h3>
+
+<p>This blog will explore various aspects of laptop-friendly computational medicinal chemistry, including:</p>
+
+<ul>
+  <li><strong>Molecular modeling and visualization techniques</strong> that help us understand drug-target interactions</li>
+  <li><strong>QSAR (Quantitative Structure-Activity Relationship)</strong> approaches to predict biological activity</li>
+  <li><strong>Virtual screening methods</strong> to identify promising drug candidates</li>
+  <li><strong>Open-source cheminformatics tools</strong> that make professional-grade analysis accessible</li>
+  <li><strong>Data mining of chemical databases</strong> to uncover patterns and insights</li>
+  <li><strong>Machine learning applications</strong> in drug discovery</li>
+  <li><strong>Accessible molecular dynamics</strong> simulations on consumer hardware</li>
+</ul>
+
+<p>Whether you’re a student, a professional looking to expand your skill set, or simply someone curious about how computers are helping us design the medicines of tomorrow, I hope you’ll find something valuable here.</p>
+
+<p>Let’s explore the molecular world through our screens together!</p>]]></content><author><name>Brad Dallin</name></author><category term="Miscellaneous" /><summary type="html"><![CDATA[Welcome to Laptop Chemistry]]></summary></entry></feed>
