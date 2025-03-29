@@ -6,10 +6,10 @@ author:
 # The `>` after `description:` means to ignore line-breaks until next key.
 # If you want to omit the line-break after the end of text, use `>-` instead.
 description: >
-  "Code, compounds, and cures: 
-  Insights from the digital frontier of drug discovery on your laptop."
+  "Unlock the World of Molecules and Data: Dive into the Chemistry from Your Laptop."
 
 # Alternative descriptions
+# "Code, compounds, and cures: Insights from the digital frontier of drug discovery on your laptop."
 # "Unlock the World of Molecules and Data: Dive into the Chemistry from Your Laptop."
 # "Exploring the intersection of code and compounds: insights into computational approaches for drug discovery and design."
 # "Decoding drug discovery: A computational chemist's journey through algorithms, models, and molecular interactions."
