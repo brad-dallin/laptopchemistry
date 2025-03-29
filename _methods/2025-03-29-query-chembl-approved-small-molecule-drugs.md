@@ -5,7 +5,7 @@ author: Brad Dallin
 catagories: methods
 ---
 
-I created this post to document some of my learnings by building a SQL query that retrives the chemical structures and data from the Chembl database. Prior to running, I already downloaded the Chembl database and hosted it locally using the Postgres App for Mac.
+I wanted to document some of my learnings by building a SQL query that retrives the chemical structures and data from the Chembl database. Prior to running, I already downloaded the Chembl database and hosted it locally using the Postgres App for Mac.
 
 Instructions for downloading the Chembl database can be found [here](https://chembl.gitbook.io/chembl-interface-documentation/downloads) and installation instructions for Postgres App [here](https://postgresapp.com).
 
