@@ -6,8 +6,20 @@ author:
 # The `>` after `description:` means to ignore line-breaks until next key.
 # If you want to omit the line-break after the end of text, use `>-` instead.
 description: >
-  "Unlock the World of Molecules and Data:
-  Dive into the Chemistry from Your Laptop."
+  "Code, compounds, and cures: 
+  Insights from the digital frontier of drug discovery on your laptop."
+
+# Alternative descriptions
+# "Unlock the World of Molecules and Data: Dive into the Chemistry from Your Laptop."
+# "Exploring the intersection of code and compounds: insights into computational approaches for drug discovery and design."
+# "Decoding drug discovery: A computational chemist's journey through algorithms, models, and molecular interactions."
+# "Bytes to bedside: Chronicling the computational methods driving modern medicinal chemistry."
+# "Where silicon meets science: Practical applications of computational tools in medicinal chemistry research."
+# "Modeling molecules, predicting properties: A technical dive into computational medicinal chemistry."
+# "Algorithms and active sites: Exploring how computational methods are revolutionizing medicinal chemistry."
+# "From keystrokes to key discoveries: A practical blog on computational approaches to drug design."
+# "Quantum calculations to quantifiable results: Bridging computational science and medicinal chemistry."
+# "The digital laboratory: Chronicles of a computational medicinal chemist."
 
 # Build settings
 
