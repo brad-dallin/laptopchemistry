@@ -1,18 +1,16 @@
 ---
 layout: post
-title: Query Chembl for Approved Small Molecule Drugs
+title: Query ChEMBL for Approved Small Molecule Drugs
 author: Brad Dallin
 catagories: methods
 ---
 
-I wanted to document some of my learnings by building a SQL query that retrives the chemical structures and data from the Chembl database. Prior to running, I already downloaded the Chembl database and hosted it locally using the Postgres App for Mac.
-
-Instructions for downloading the Chembl database can be found [here](https://chembl.gitbook.io/chembl-interface-documentation/downloads) and installation instructions for Postgres App [here](https://postgresapp.com). Link to the Jupyter Notebook I used can be found [here](https://github.com/brad-dallin/laptopchemistry/blob/main/notebooks/qry_chembl_approved_small_molecule_drugs.ipynb).
+I wanted to document some of my learnings by building a SQL query that retrieves the chemical structures and data from the ChEMBL database. Prior to running, I already downloaded the ChEMBL database and hosted it locally using the Postgres App for Mac.
+Instructions for downloading the ChEMBL database can be found [here](https://chembl.gitbook.io/chembl-interface-documentation/downloads) and installation instructions for Postgres App [here](https://postgresapp.com).
 
 
 ### **1. Import modules**
-
-I prefer working with the pandas and adbc_driver_postgresql modules for Postgres queries and dataframes. By default, pandas truncates the number of columns printed. I adjusted the max column setting to print all columns.
+I prefer working with the adbc_driver_postgresql and pandas modules for Postgres queries and dataframes. By default, pandas truncates the number of columns printed. I adjusted the max column setting to print all columns.
 
 ```python
 # Import modules
@@ -32,8 +30,7 @@ print(f"ADBC Driver Version: {adbc_driver_postgresql.__version__}")
 
 
 ### 2. **Test Connection to PostgreSQL**
-
-I set the URI hosting the Chembl database on my localhost. I used a very basic SQL query to test the connection to Postgres.
+I set the URI hosting the ChEMBL database on my localhost. I used a very basic SQL query to test the connection to Postgres.
 
 ```python
 uri = "postgresql://localhost/Chembl35"
@@ -49,9 +46,8 @@ except:
     Database connected successfully
 
 
-### 3. **Preview All Available Tables in Chembl35 Database**
-
-The Chembl database contains a lot of data which has been split into separate tables. I often need to query and merge multiple tables to get all the data needed. I ran this command to list all the available tables in Chembl.
+### 3. **Preview All Available Tables in ChEMBL Database**
+The ChEMBL database contains a lot of data which has been split into separate tables. I often need to query and merge multiple tables to get all the data needed. I ran this command to list all the available tables in ChEMBL.
 
 ```python
 sql_list_tables = """
@@ -95,7 +91,6 @@ print(chembl_tables_df["table_name"].values)
 
 
 ### 4. **Preview All Columns in Compound Structures Table**
-
 To see which columns are available in the compound structures table, I ran this query. Canonical SMILES are available in this table as well.
 
 ```python
@@ -121,8 +116,7 @@ print(f"Columns: {chembl_columns_df["column_name"].values}")
 
 
 ### 5. **Preview All Columns in Molecule Dictionary**
-
-To see which columns are available in the molecule dictionary table, I ran this query. The molecule dictionary table contains much of the data about the drug information.
+To see which columns are available in the molecule dictionary table, I ran this query. The molecule dictionary table contains much of the drug information data.
 
 ```python
 sql_table = "molecule_dictionary"
@@ -152,8 +146,7 @@ print(f"Columns: {chembl_columns_df["column_name"].values}")
 
 
 ### 6. **Preview All Columns in Compound Properties**
-
-To see which columns are available in the compound properties table, I ran this query. Compound properties are mostly physicochemical properties of the molecule.
+To see which columns are available in the compound properties table, I ran this query. Compound properties are mostly the physicochemical properties of the molecule.
 
 ```python
 sql_table = "compound_properties"
@@ -180,9 +173,8 @@ print(f"Columns: {chembl_columns_df["column_name"].values}")
      'hbd_lipinski' 'num_lipinski_ro5_violations' 'np_likeness_score']
 
 
-### 7. **Query Chembl Database for Small Molecule Drugs and Merge Tables**
-
-I took the information about the columns above and combined it into a query/filter for small molecule drugs. It may be little excessive to include all columns, but this is how you could keep all the data. I often find it easier to filter data later on, rather than go back to retreive or generate the data again.
+### 7. **Query ChEMBL Database for Small Molecule Drugs and Merge Tables**
+I took the information about the columns above and combined it into a query/filter for small molecule drugs. It may be a little excessive to include all columns, but this is how you could keep all the data in view. I often find it easier to filter data later, rather than go back to retrieve or generate the data again.
 
 ```python
 sql_query="""
@@ -224,359 +216,361 @@ chembl_df.head()
     (3517, 53)
 
 <div style="overflow-x: auto; width: 100%;">
-    <style scoped>
-        .dataframe tbody tr th:only-of-type {
-            vertical-align: middle;
-        }
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
-        .dataframe tbody tr th {
-            vertical-align: top;
-        }
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
 
-        .dataframe thead th {
-            text-align: right;
-        }
-    </style>
-    <table border="1" class="dataframe">
-        <thead>
-            <tr style="text-align: right;">
-            <th></th>
-            <th>molecule_chembl_id</th>
-            <th>smiles</th>
-            <th>molregno</th>
-            <th>pref_name</th>
-            <th>max_phase</th>
-            <th>therapeutic_flag</th>
-            <th>dosed_ingredient</th>
-            <th>structure_type</th>
-            <th>chebi_par_id</th>
-            <th>molecule_type</th>
-            <th>first_approval</th>
-            <th>oral</th>
-            <th>parenteral</th>
-            <th>topical</th>
-            <th>black_box_warning</th>
-            <th>natural_product</th>
-            <th>first_in_class</th>
-            <th>chirality</th>
-            <th>prodrug</th>
-            <th>inorganic_flag</th>
-            <th>usan_year</th>
-            <th>availability_type</th>
-            <th>usan_stem</th>
-            <th>polymer_flag</th>
-            <th>usan_substem</th>
-            <th>usan_stem_definition</th>
-            <th>indication_class</th>
-            <th>withdrawn_flag</th>
-            <th>chemical_probe</th>
-            <th>orphan</th>
-            <th>mw_freebase</th>
-            <th>alogp</th>
-            <th>hba</th>
-            <th>hbd</th>
-            <th>psa</th>
-            <th>rtb</th>
-            <th>ro3_pass</th>
-            <th>num_ro5_violations</th>
-            <th>cx_most_apka</th>
-            <th>cx_most_bpka</th>
-            <th>cx_logp</th>
-            <th>cx_logd</th>
-            <th>molecular_species</th>
-            <th>full_mwt</th>
-            <th>aromatic_rings</th>
-            <th>heavy_atoms</th>
-            <th>qed_weighted</th>
-            <th>mw_monoisotopic</th>
-            <th>full_molformula</th>
-            <th>hba_lipinski</th>
-            <th>hbd_lipinski</th>
-            <th>num_lipinski_ro5_violations</th>
-            <th>np_likeness_score</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-            <th>0</th>
-            <td>CHEMBL1200542</td>
-            <td>CC(=O)OCC(=O)[C@H]1CC[C@H]2[C@@H]3CCC4=CC(=O)C...</td>
-            <td>674493</td>
-            <td>DESOXYCORTICOSTERONE ACETATE</td>
-            <td>4.0</td>
-            <td>1</td>
-            <td>1</td>
-            <td>MOL</td>
-            <td>34671.0</td>
-            <td>Small molecule</td>
-            <td>1939.0</td>
-            <td>0</td>
-            <td>1</td>
-            <td>0</td>
-            <td>0</td>
-            <td>1</td>
-            <td>0</td>
-            <td>1</td>
-            <td>0</td>
-            <td>0</td>
-            <td>NaN</td>
-            <td>0.0</td>
-            <td>-cort-; -ster-; -terone</td>
-            <td>0</td>
-            <td>-cort-; -ster-; -terone</td>
-            <td>cortisone derivatives; steroids (androgens, an...</td>
-            <td>Adrenocortical Steroid (salt-regulating)</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>372.51</td>
-            <td>4.27</td>
-            <td>4.0</td>
-            <td>0.0</td>
-            <td>60.44</td>
-            <td>3.0</td>
-            <td>N</td>
-            <td>0.0</td>
-            <td>None</td>
-            <td>None</td>
-            <td>3.77</td>
-            <td>3.77</td>
-            <td>NEUTRAL</td>
-            <td>372.51</td>
-            <td>0.0</td>
-            <td>27.0</td>
-            <td>0.69</td>
-            <td>372.2301</td>
-            <td>C23H32O4</td>
-            <td>4.0</td>
-            <td>0.0</td>
-            <td>0.0</td>
-            <td>1.96</td>
-            </tr>
-            <tr>
-            <th>1</th>
-            <td>CHEMBL1200728</td>
-            <td>Cl.N=C(N)N</td>
-            <td>674679</td>
-            <td>GUANIDINE HYDROCHLORIDE</td>
-            <td>4.0</td>
-            <td>1</td>
-            <td>1</td>
-            <td>MOL</td>
-            <td>32735.0</td>
-            <td>Small molecule</td>
-            <td>1939.0</td>
-            <td>1</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>2</td>
-            <td>0</td>
-            <td>0</td>
-            <td>NaN</td>
-            <td>1.0</td>
-            <td>guan-</td>
-            <td>0</td>
-            <td>guan-</td>
-            <td>antihypertensives (guanidine derivatives)</td>
-            <td>None</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>59.07</td>
-            <td>-1.16</td>
-            <td>1.0</td>
-            <td>3.0</td>
-            <td>75.89</td>
-            <td>0.0</td>
-            <td>N</td>
-            <td>0.0</td>
-            <td>None</td>
-            <td>12.55</td>
-            <td>-1.24</td>
-            <td>-3.65</td>
-            <td>BASE</td>
-            <td>95.53</td>
-            <td>0.0</td>
-            <td>4.0</td>
-            <td>0.24</td>
-            <td>59.0483</td>
-            <td>CH6ClN3</td>
-            <td>3.0</td>
-            <td>5.0</td>
-            <td>0.0</td>
-            <td>0.32</td>
-            </tr>
-            <tr>
-            <th>2</th>
-            <td>CHEMBL1200982</td>
-            <td>CCC(C)C1(CC)C(=O)[N-]C(=O)NC1=O.[Na+]</td>
-            <td>674933</td>
-            <td>BUTABARBITAL SODIUM</td>
-            <td>4.0</td>
-            <td>1</td>
-            <td>1</td>
-            <td>MOL</td>
-            <td>NaN</td>
-            <td>Small molecule</td>
-            <td>1939.0</td>
-            <td>1</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>NaN</td>
-            <td>1.0</td>
-            <td>-barb-</td>
-            <td>0</td>
-            <td>-barb-</td>
-            <td>barbituric acid derivatives</td>
-            <td>Sedative-Hypnotic</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>212.25</td>
-            <td>0.79</td>
-            <td>3.0</td>
-            <td>2.0</td>
-            <td>75.27</td>
-            <td>3.0</td>
-            <td>N</td>
-            <td>0.0</td>
-            <td>7.48</td>
-            <td>None</td>
-            <td>1.45</td>
-            <td>1.19</td>
-            <td>NEUTRAL</td>
-            <td>234.23</td>
-            <td>0.0</td>
-            <td>15.0</td>
-            <td>0.68</td>
-            <td>212.1161</td>
-            <td>C10H15N2NaO3</td>
-            <td>5.0</td>
-            <td>2.0</td>
-            <td>0.0</td>
-            <td>0.32</td>
-            </tr>
-            <tr>
-            <th>3</th>
-            <td>CHEMBL3989520</td>
-            <td>NCCc1c[nH]cn1.O=P(O)(O)O.O=P(O)(O)O</td>
-            <td>2197391</td>
-            <td>HISTAMINE PHOSPHATE</td>
-            <td>4.0</td>
-            <td>1</td>
-            <td>1</td>
-            <td>MOL</td>
-            <td>NaN</td>
-            <td>Small molecule</td>
-            <td>1939.0</td>
-            <td>0</td>
-            <td>1</td>
-            <td>0</td>
-            <td>1</td>
-            <td>0</td>
-            <td>0</td>
-            <td>2</td>
-            <td>0</td>
-            <td>0</td>
-            <td>NaN</td>
-            <td>0.0</td>
-            <td>None</td>
-            <td>0</td>
-            <td>None</td>
-            <td>None</td>
-            <td>None</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>111.15</td>
-            <td>-0.09</td>
-            <td>2.0</td>
-            <td>2.0</td>
-            <td>54.70</td>
-            <td>2.0</td>
-            <td>Y</td>
-            <td>0.0</td>
-            <td>None</td>
-            <td>9.58</td>
-            <td>-0.70</td>
-            <td>-2.85</td>
-            <td>BASE</td>
-            <td>307.14</td>
-            <td>1.0</td>
-            <td>8.0</td>
-            <td>0.56</td>
-            <td>111.0796</td>
-            <td>C5H15N3O8P2</td>
-            <td>3.0</td>
-            <td>3.0</td>
-            <td>0.0</td>
-            <td>0.00</td>
-            </tr>
-            <tr>
-            <th>4</th>
-            <td>CHEMBL449</td>
-            <td>CCC(C)C1(CC)C(=O)NC(=O)NC1=O</td>
-            <td>2393</td>
-            <td>BUTABARBITAL</td>
-            <td>4.0</td>
-            <td>1</td>
-            <td>0</td>
-            <td>MOL</td>
-            <td>3228.0</td>
-            <td>Small molecule</td>
-            <td>1939.0</td>
-            <td>1</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>1</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>NaN</td>
-            <td>1.0</td>
-            <td>-barb-</td>
-            <td>0</td>
-            <td>-barb-</td>
-            <td>barbituric acid derivatives</td>
-            <td>Sedative-Hypnotic</td>
-            <td>0</td>
-            <td>0</td>
-            <td>0</td>
-            <td>212.25</td>
-            <td>0.79</td>
-            <td>3.0</td>
-            <td>2.0</td>
-            <td>75.27</td>
-            <td>3.0</td>
-            <td>N</td>
-            <td>0.0</td>
-            <td>7.48</td>
-            <td>None</td>
-            <td>1.45</td>
-            <td>1.19</td>
-            <td>NEUTRAL</td>
-            <td>212.25</td>
-            <td>0.0</td>
-            <td>15.0</td>
-            <td>0.68</td>
-            <td>212.1161</td>
-            <td>C10H16N2O3</td>
-            <td>5.0</td>
-            <td>2.0</td>
-            <td>0.0</td>
-            <td>0.32</td>
-            </tr>
-        </tbody>
-    </table>
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>molecule_chembl_id</th>
+      <th>smiles</th>
+      <th>molregno</th>
+      <th>pref_name</th>
+      <th>max_phase</th>
+      <th>therapeutic_flag</th>
+      <th>dosed_ingredient</th>
+      <th>structure_type</th>
+      <th>chebi_par_id</th>
+      <th>molecule_type</th>
+      <th>first_approval</th>
+      <th>oral</th>
+      <th>parenteral</th>
+      <th>topical</th>
+      <th>black_box_warning</th>
+      <th>natural_product</th>
+      <th>first_in_class</th>
+      <th>chirality</th>
+      <th>prodrug</th>
+      <th>inorganic_flag</th>
+      <th>usan_year</th>
+      <th>availability_type</th>
+      <th>usan_stem</th>
+      <th>polymer_flag</th>
+      <th>usan_substem</th>
+      <th>usan_stem_definition</th>
+      <th>indication_class</th>
+      <th>withdrawn_flag</th>
+      <th>chemical_probe</th>
+      <th>orphan</th>
+      <th>mw_freebase</th>
+      <th>alogp</th>
+      <th>hba</th>
+      <th>hbd</th>
+      <th>psa</th>
+      <th>rtb</th>
+      <th>ro3_pass</th>
+      <th>num_ro5_violations</th>
+      <th>cx_most_apka</th>
+      <th>cx_most_bpka</th>
+      <th>cx_logp</th>
+      <th>cx_logd</th>
+      <th>molecular_species</th>
+      <th>full_mwt</th>
+      <th>aromatic_rings</th>
+      <th>heavy_atoms</th>
+      <th>qed_weighted</th>
+      <th>mw_monoisotopic</th>
+      <th>full_molformula</th>
+      <th>hba_lipinski</th>
+      <th>hbd_lipinski</th>
+      <th>num_lipinski_ro5_violations</th>
+      <th>np_likeness_score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>CHEMBL1200542</td>
+      <td>CC(=O)OCC(=O)[C@H]1CC[C@H]2[C@@H]3CCC4=CC(=O)C...</td>
+      <td>674493</td>
+      <td>DESOXYCORTICOSTERONE ACETATE</td>
+      <td>4.0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>MOL</td>
+      <td>34671.0</td>
+      <td>Small molecule</td>
+      <td>1939.0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>0.0</td>
+      <td>-cort-; -ster-; -terone</td>
+      <td>0</td>
+      <td>-cort-; -ster-; -terone</td>
+      <td>cortisone derivatives; steroids (androgens, an...</td>
+      <td>Adrenocortical Steroid (salt-regulating)</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>372.51</td>
+      <td>4.27</td>
+      <td>4.0</td>
+      <td>0.0</td>
+      <td>60.44</td>
+      <td>3.0</td>
+      <td>N</td>
+      <td>0.0</td>
+      <td>None</td>
+      <td>None</td>
+      <td>3.77</td>
+      <td>3.77</td>
+      <td>NEUTRAL</td>
+      <td>372.51</td>
+      <td>0.0</td>
+      <td>27.0</td>
+      <td>0.69</td>
+      <td>372.2301</td>
+      <td>C23H32O4</td>
+      <td>4.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.96</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>CHEMBL1200728</td>
+      <td>Cl.N=C(N)N</td>
+      <td>674679</td>
+      <td>GUANIDINE HYDROCHLORIDE</td>
+      <td>4.0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>MOL</td>
+      <td>32735.0</td>
+      <td>Small molecule</td>
+      <td>1939.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>1.0</td>
+      <td>guan-</td>
+      <td>0</td>
+      <td>guan-</td>
+      <td>antihypertensives (guanidine derivatives)</td>
+      <td>None</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>59.07</td>
+      <td>-1.16</td>
+      <td>1.0</td>
+      <td>3.0</td>
+      <td>75.89</td>
+      <td>0.0</td>
+      <td>N</td>
+      <td>0.0</td>
+      <td>None</td>
+      <td>12.55</td>
+      <td>-1.24</td>
+      <td>-3.65</td>
+      <td>BASE</td>
+      <td>95.53</td>
+      <td>0.0</td>
+      <td>4.0</td>
+      <td>0.24</td>
+      <td>59.0483</td>
+      <td>CH6ClN3</td>
+      <td>3.0</td>
+      <td>5.0</td>
+      <td>0.0</td>
+      <td>0.32</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>CHEMBL1200982</td>
+      <td>CCC(C)C1(CC)C(=O)[N-]C(=O)NC1=O.[Na+]</td>
+      <td>674933</td>
+      <td>BUTABARBITAL SODIUM</td>
+      <td>4.0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>MOL</td>
+      <td>NaN</td>
+      <td>Small molecule</td>
+      <td>1939.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>1.0</td>
+      <td>-barb-</td>
+      <td>0</td>
+      <td>-barb-</td>
+      <td>barbituric acid derivatives</td>
+      <td>Sedative-Hypnotic</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>212.25</td>
+      <td>0.79</td>
+      <td>3.0</td>
+      <td>2.0</td>
+      <td>75.27</td>
+      <td>3.0</td>
+      <td>N</td>
+      <td>0.0</td>
+      <td>7.48</td>
+      <td>None</td>
+      <td>1.45</td>
+      <td>1.19</td>
+      <td>NEUTRAL</td>
+      <td>234.23</td>
+      <td>0.0</td>
+      <td>15.0</td>
+      <td>0.68</td>
+      <td>212.1161</td>
+      <td>C10H15N2NaO3</td>
+      <td>5.0</td>
+      <td>2.0</td>
+      <td>0.0</td>
+      <td>0.32</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>CHEMBL3989520</td>
+      <td>NCCc1c[nH]cn1.O=P(O)(O)O.O=P(O)(O)O</td>
+      <td>2197391</td>
+      <td>HISTAMINE PHOSPHATE</td>
+      <td>4.0</td>
+      <td>1</td>
+      <td>1</td>
+      <td>MOL</td>
+      <td>NaN</td>
+      <td>Small molecule</td>
+      <td>1939.0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>0.0</td>
+      <td>None</td>
+      <td>0</td>
+      <td>None</td>
+      <td>None</td>
+      <td>None</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>111.15</td>
+      <td>-0.09</td>
+      <td>2.0</td>
+      <td>2.0</td>
+      <td>54.70</td>
+      <td>2.0</td>
+      <td>Y</td>
+      <td>0.0</td>
+      <td>None</td>
+      <td>9.58</td>
+      <td>-0.70</td>
+      <td>-2.85</td>
+      <td>BASE</td>
+      <td>307.14</td>
+      <td>1.0</td>
+      <td>8.0</td>
+      <td>0.56</td>
+      <td>111.0796</td>
+      <td>C5H15N3O8P2</td>
+      <td>3.0</td>
+      <td>3.0</td>
+      <td>0.0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>CHEMBL449</td>
+      <td>CCC(C)C1(CC)C(=O)NC(=O)NC1=O</td>
+      <td>2393</td>
+      <td>BUTABARBITAL</td>
+      <td>4.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>MOL</td>
+      <td>3228.0</td>
+      <td>Small molecule</td>
+      <td>1939.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>1.0</td>
+      <td>-barb-</td>
+      <td>0</td>
+      <td>-barb-</td>
+      <td>barbituric acid derivatives</td>
+      <td>Sedative-Hypnotic</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>212.25</td>
+      <td>0.79</td>
+      <td>3.0</td>
+      <td>2.0</td>
+      <td>75.27</td>
+      <td>3.0</td>
+      <td>N</td>
+      <td>0.0</td>
+      <td>7.48</td>
+      <td>None</td>
+      <td>1.45</td>
+      <td>1.19</td>
+      <td>NEUTRAL</td>
+      <td>212.25</td>
+      <td>0.0</td>
+      <td>15.0</td>
+      <td>0.68</td>
+      <td>212.1161</td>
+      <td>C10H16N2O3</td>
+      <td>5.0</td>
+      <td>2.0</td>
+      <td>0.0</td>
+      <td>0.32</td>
+    </tr>
+  </tbody>
+</table>
 </div>
+
+
