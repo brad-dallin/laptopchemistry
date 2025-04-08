@@ -5,7 +5,7 @@ author: Brad Dallin
 catagories: methods
 ---
 
-In this Methods post, I wanted to document a few tricks for processing/profiling chemical data with RDKit. Chemical datasets often come from a variety of sources and formats. It is often best, if not standard, practice to process and standardize the structures before moving on to more intense modeling tasks. Prior to running, I have created a conda environment with RDKit installed (see [here](https://www.rdkit.org/docs/Install.html)) and retrieved small molecule data from ChEMBL [here](https://brad-dallin.github.io/laptopchemistry/methods/2025-03-29-query-chembl-approved-small-molecule-drugs.html)
+In this Methods post, I wanted to document a few tricks for processing/profiling chemical data with RDKit. Chemical datasets often come from a variety of sources and formats. It is often best, if not standard, practice to process and standardize the structures before moving on to more intense modeling tasks. Prior to running, I have created a conda environment with RDKit installed (see [here](https://www.rdkit.org/docs/Install.html)) and retrieved small molecule data from ChEMBL [here](https://brad-dallin.github.io/laptopchemistry/methods/2025-03-29-query-chembl-approved-small-molecule-drugs.html). The jupyter notebook for this methods post can be found [here](https://github.com/brad-dallin/laptopchemistry/blob/main/notebooks/rdkit_molecule_2d_profiling.ipynb)
 
 ### **1. Import modules**
 To process the molecules, I used RDKit and Pandas. Pandas by default will truncate the number of displayed rows. I set the Pandas display option to max columns. Much of RDKit is done at the C++ level, including logging. To suppress excessive output, I have I disabled logging. Comment this line for debugging. Versions are also printed.
@@ -50,7 +50,7 @@ def show_acs1996(mol, legend=""):
 ```
 
 ### **3. Load dataset**
-The dataset used can be found in the notebooks folder of this repository [here](link). Pandas is used to load the CSV file.
+The dataset used can be found in the notebooks folder of this repository [here](https://github.com/brad-dallin/laptopchemistry/tree/main/notebooks/data). Pandas is used to load the CSV file.
 
 ```python
 # Paths

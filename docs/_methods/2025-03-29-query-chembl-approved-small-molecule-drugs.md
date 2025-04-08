@@ -6,7 +6,7 @@ catagories: methods
 ---
 
 I wanted to document some of my learnings by building a SQL query that retrieves the chemical structures and data from the ChEMBL database. Prior to running, I already downloaded the ChEMBL database and hosted it locally using the Postgres App for Mac.
-Instructions for downloading the ChEMBL database can be found [here](https://chembl.gitbook.io/chembl-interface-documentation/downloads) and installation instructions for Postgres App [here](https://postgresapp.com).
+Instructions for downloading the ChEMBL database can be found [here](https://chembl.gitbook.io/chembl-interface-documentation/downloads) and installation instructions for Postgres App [here](https://postgresapp.com). The jupyter notebook for this methods post can be found [here](https://github.com/brad-dallin/laptopchemistry/blob/main/notebooks/qry_chembl_approved_small_molecule_drugs.ipynb)
 
 
 ### **1. Import modules**
