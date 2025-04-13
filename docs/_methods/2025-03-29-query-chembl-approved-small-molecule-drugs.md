@@ -1,16 +1,83 @@
 ---
 layout: post
-title: Query ChEMBL for Approved Small Molecule Drugs
+title: "How to Query ChEMBL Database for Approved Small Molecule Drugs: A Step-by-Step Guide"
 author: Brad Dallin
 catagories: methods
 ---
 
-I wanted to document some of my learnings by building a SQL query that retrieves the chemical structures and data from the ChEMBL database. Prior to running, I already downloaded the ChEMBL database and hosted it locally using the Postgres App for Mac.
-Instructions for downloading the ChEMBL database can be found [here](https://chembl.gitbook.io/chembl-interface-documentation/downloads) and installation instructions for Postgres App [here](https://postgresapp.com). The jupyter notebook for this methods post can be found [here](https://github.com/brad-dallin/laptopchemistry/blob/main/notebooks/qry_chembl_approved_small_molecule_drugs.ipynb)
+In this step-by-step guide, I'll show you how to build a SQL query to extract chemical structures and drug data from the ChEMBL database. As a valuable resource for drug discovery and cheminformatics research, ChEMBL contains extensive information on bioactive molecules. This tutorial assumes some basic familiarity with SQL and Python.
+
+## **0. Setting Up Your Environment**
+
+Before querying the ChEMBL database, you'll need to set up your environment properly. This section covers the prerequisite installations and configurations needed to follow this tutorial.
 
 
-### **1. Import modules**
-I prefer working with the adbc_driver_postgresql and pandas modules for Postgres queries and dataframes. By default, pandas truncates the number of columns printed. I adjusted the max column setting to print all columns.
+### **Prerequisites**
+
+ChEMBL Database: A local installation of the ChEMBL database
+
+PostgreSQL: A running PostgreSQL server (I used Postgres App for Mac)
+
+Python 3.7+: With necessary libraries for database connection and data manipulation
+
+
+### **Installing the ChEMBL Database**
+
+The ChEMBL database is a comprehensive resource of bioactive molecules with drug-like properties. To download and install:
+
+Install the Postgres App ([here](https://postgresapp.com)), if you're using macOS
+
+```python
+# Install PostgreSQL (v17 - 2025-03-01)
+curl -JOfSL --output-dir {DOWNLOAD_PATH} https://github.com/PostgresApp/PostgresApp/releases/download/v2.8.1/Postgres-2.8.1-17.dmg
+open Postgres-2.8.1-17.dmg
+
+# Add CLI utilities
+sudo mkdir -p /etc/paths.d && echo /Applications/Postgres.app/Contents/Versions/latest/bin | sudo tee /etc/paths.d/postgresapp
+```
+
+Download the latest PostgreSQL dump from the [ChEMBL Downloads page](https://chembl.gitbook.io/chembl-interface-documentation/downloads)
+
+```python
+# Download Chembl DB (v35 - 2025-03-01)
+curl -JOfSL --output-dir {DOWNLOAD_PATH} https://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/latest/chembl_35_postgresql.tar.gz
+tar -xzvf chembl_35_postgresql.tar.gz
+```
+
+### **Create a new database for ChEMBL**
+This process can take some time depending on your system specifications.
+
+```python
+# Create new database
+dropdb chembl35
+createdb chembl35
+pg_restore --verbose --no-owner --host=localhost --port=5432 --username=postgres --dbname=chembl35 {PATHTO}/chembl_35_postgresql.dmp
+```
+
+
+### **Python Environment Setup**
+
+For this tutorial, we'll use the adbc_driver_postgresql module for database connectivity and pandas for data manipulation. Install these packages using conda, preferably in a clean environment. I installed these within my RDKit environment.
+
+```python
+# Create RDKit conda environment
+conda create -n rdkit-env conda-forge::rdkit
+
+#Conda install ADBC Driver PostgreSQL
+conda install conda-forge::adbc-driver-postgresql
+
+# Conda install PyArrow
+conda install conda-forge::pyarrow
+```
+
+The psycopg2 module can also be used, if you prefer. Although, the adbc_driver_postgresql module provides a more modern interface compared to psycopg2 and integrates well with pandas for data analysis workflow, see [here](https://pandas.pydata.org/docs/reference/api/pandas.read_sql.html).
+
+Now that our environment is ready, let's proceed to connect to the database and start exploring the ChEMBL data structure.
+
+
+## **1. Import modules**
+
+Import pandas and adbc_driver_postgresql. By default, pandas truncates the number of columns printed. I adjusted the max column setting to print all columns.
 
 ```python
 # Import modules
@@ -29,11 +96,12 @@ print(f"ADBC Driver Version: {adbc_driver_postgresql.__version__}")
     ADBC Driver Version: 1.5.0
 
 
-### 2. **Test Connection to PostgreSQL**
-I set the URI hosting the ChEMBL database on my localhost. I used a very basic SQL query to test the connection to Postgres.
+## 2. **Test Connection to PostgreSQL**
+
+Set the URI hosting the ChEMBL database to localhost. Then use a basic SQL query to test the connection to the database.
 
 ```python
-uri = "postgresql://localhost/Chembl35"
+uri = "postgresql://localhost/chembl35"
 try:
     conn = adbc_driver_postgresql.dbapi.connect(uri)
     with conn.cursor() as cur:
@@ -46,8 +114,9 @@ except:
     Database connected successfully
 
 
-### 3. **Preview All Available Tables in ChEMBL Database**
-The ChEMBL database contains a lot of data which has been split into separate tables. I often need to query and merge multiple tables to get all the data needed. I ran this command to list all the available tables in ChEMBL.
+## 3. **Preview All Available Tables in ChEMBL Database**
+
+The ChEMBL database contains a lot of data which has been split into tables. You will often need to query and merge multiple tables to get all the data needed. Run the query below to list all the available tables in the database.
 
 ```python
 sql_list_tables = """
@@ -90,8 +159,9 @@ print(chembl_tables_df["table_name"].values)
      'usan_stems' 'variant_sequences' 'version' 'warning_refs']
 
 
-### 4. **Preview All Columns in Compound Structures Table**
-To see which columns are available in the compound structures table, I ran this query. Canonical SMILES are available in this table as well.
+## 4. **Preview All Columns in Compound Structures Table**
+
+Run this query to see which columns are available in the compound structures table. Canonical SMILES are also available in this table.
 
 ```python
 sql_table = "compound_structures"
@@ -115,8 +185,9 @@ print(f"Columns: {chembl_columns_df["column_name"].values}")
      'src_compound_id' 'cidx']
 
 
-### 5. **Preview All Columns in Molecule Dictionary**
-To see which columns are available in the molecule dictionary table, I ran this query. The molecule dictionary table contains much of the drug information data.
+## 5. **Preview All Columns in Molecule Dictionary**
+
+Run this query to see which columns are available in the molecule dictionary table, I ran this query. The molecule dictionary table contains much of the drug information data.
 
 ```python
 sql_table = "molecule_dictionary"
@@ -145,8 +216,9 @@ print(f"Columns: {chembl_columns_df["column_name"].values}")
      'chemical_probe' 'orphan']
 
 
-### 6. **Preview All Columns in Compound Properties**
-To see which columns are available in the compound properties table, I ran this query. Compound properties are mostly the physicochemical properties of the molecule.
+## 6. **Preview All Columns in Compound Properties**
+
+Run this query to see which columns are available in the compound properties table. Compound properties are mostly the physicochemical properties of the molecule.
 
 ```python
 sql_table = "compound_properties"
@@ -173,8 +245,9 @@ print(f"Columns: {chembl_columns_df["column_name"].values}")
      'hbd_lipinski' 'num_lipinski_ro5_violations' 'np_likeness_score']
 
 
-### 7. **Query ChEMBL Database for Small Molecule Drugs and Merge Tables**
-I took the information about the columns above and combined it into a query/filter for small molecule drugs. It may be a little excessive to include all columns, but this is how you could keep all the data in view. I often find it easier to filter data later, rather than go back to retrieve or generate the data again.
+## 7. **Query ChEMBL Database for Small Molecule Drugs and Merge Tables**
+
+You can take the information about the columns above and combine it into a query/filter for small molecule drugs. It may be a little excessive to include all columns, but this is how you could keep all the data in view. It’s often easier to filter data later, rather than go back to retrieve or generate the data again. Uncomment chembl_df.to_csv command and add a file path to save the data to file.
 
 ```python
 sql_query="""
@@ -212,6 +285,12 @@ with conn.cursor() as cur:
     )
 print(chembl_df.shape)
 chembl_df.head()
+# Save to file
+# chembl_df.to_csv(
+#     output_file_path,
+#     index=False,
+#     encoding="utf-8"
+# )
 ```
     (3517, 53)
 
@@ -572,5 +651,3 @@ chembl_df.head()
   </tbody>
 </table>
 </div>
-
-
