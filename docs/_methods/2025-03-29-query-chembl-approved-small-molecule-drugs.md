@@ -71,7 +71,7 @@ pg_restore --verbose --no-owner --host=localhost --port=5432 --username=postgres
 
 ### **Python Environment Setup** {#python-setup}
 
-For this tutorial, we'll use the adbc_driver_postgresql module for database connectivity and pandas for data manipulation. Install these packages using conda, preferably in a clean environment. I installed these within my RDKit environment.
+For this tutorial, we'll use the `adbc_driver_postgresql` module for database connectivity and pandas for data manipulation. Install these packages using conda, preferably in a clean environment. I installed these within my RDKit environment.
 
 ```python
 # Create RDKit conda environment
@@ -84,14 +84,14 @@ conda install conda-forge::adbc-driver-postgresql
 conda install conda-forge::pyarrow
 ```
 
-The psycopg2 module can also be used, if you prefer. Although, the adbc_driver_postgresql module provides a more modern interface compared to psycopg2 and integrates well with pandas for data analysis workflow, see [here](https://pandas.pydata.org/docs/reference/api/pandas.read_sql.html).
+The `psycopg2` module can also be used, if you prefer. Although, the `adbc_driver_postgresql` module provides a more modern interface compared to `psycopg2` and integrates well with pandas for data analysis workflow, see [here](https://pandas.pydata.org/docs/reference/api/pandas.read_sql.html).
 
 Now that our environment is ready, let's proceed to connect to the database and start exploring the ChEMBL data structure.
 
 
 ## **1. Import modules** {#import-modules}
 
-Import pandas and adbc_driver_postgresql. By default, pandas truncates the number of columns printed. I adjusted the max column setting to print all columns.
+Import `pandas` and `adbc_driver_postgresql`. By default, `pandas` truncates the number of columns printed. I adjusted the max column setting to print all columns.
 
 ```python
 # Import modules
