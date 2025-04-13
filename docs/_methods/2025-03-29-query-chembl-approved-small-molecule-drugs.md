@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "How to Query ChEMBL Database for Approved Small Molecule Drugs: A Step-by-Step Guide"
+description: "Learn how to query the ChEMBL database for approved small molecule drugs using SQL and Python. Complete tutorial with code examples for cheminformatics researchers and data scientists."
 author: Brad Dallin
 catagories: methods
 ---
@@ -651,3 +652,8 @@ chembl_df.head()
   </tbody>
 </table>
 </div>
+
+
+## **Conclusion and Next Steps**
+
+This tutorial demonstrated how to query the ChEMBL database for approved small molecule drugs by merging multiple tables. The resulting dataset provides information including structures, physicochemical properties, and drug classification data. For more information on processing the data with RDKit, check out my that post [here]( https://brad-dallin.github.io/laptopchemistry/methods/2025-04-07-molecule-2d-profiling-rdkit.html) and watch for future posts exploring how to analyze this data for drug discovery applications and structure-activity relationship studies.
