@@ -17,7 +17,7 @@ This tutorial assumes basic familiarity with Python programming and chemical str
 I’ll be using a RDKit python environment I previously [created](https://brad-dallin.github.io/laptopchemistry/methods/2025-03-29-query-chembl-approved-small-molecule-drugs.html#python-setup) or see the [RDKit documentation](https://www.rdkit.org/docs/Install.html) for more details. The jupyter notebook for this methods post can be found [here](https://github.com/brad-dallin/laptopchemistry/blob/main/notebooks/rdkit_molecule_2d_profiling.ipynb).
 
 
-### **1. Import modules**
+### **1. Import modules** {#import-modules}
 
 Import `os`, `pandas`, and `rdkit` modules. `Descriptors` for calculating molecular descriptors and `rdMolStandardize` for molecule standardization are imported from `rdkit.Chem`.
 
@@ -45,7 +45,7 @@ print(f"RDKit Version: {rdkit.__version__}")
     RDKit Version: 2024.09.6
 
 
-### **2. Create ACS 1996 drawing function**
+### **2. Create ACS 1996 drawing function** {#acs1996-function}
 
 This is my personal preference for viewing 2D chemical structures and completely optional.
 
@@ -66,7 +66,7 @@ def show_acs1996(mol, legend=""):
 ```
 
 
-### **3. Load dataset**
+### **3. Load dataset**  {#load-dataset}
 Load the CSV file as a Pandas dataframe. The dataset used can be found in the notebooks folder of this repository [here](https://github.com/brad-dallin/laptopchemistry/blob/main/notebooks/data/chembl_approved_small_molecule_drugs.csv).
 
 ```python
@@ -439,7 +439,7 @@ df.head()
 </div>
 
 
-### **4. Read in a molecule with RDKit**
+### **4. Read in a molecule with RDKit** {#read-molecule}
 
 Start by reading a single SMILES in with RDKit's `MolFromSmiles()` function. This function parses the SMILES string, then constructs a graph-based molecular representation. We'll take a look at the 11th entry, sulfadiazine sodium, which is an antibacterial drug administered as a sodium salt used to treat various bacterial infections and happens to be a nice example to demonstrate the standardization process.
 
@@ -454,11 +454,17 @@ mol = rdkit.Chem.MolFromSmiles(
 )
 show_acs1996(mol, legend=id)
 ```
-    
-![png](rdkit_molecule_2d_profiling_files/rdkit_molecule_2d_profiling_8_0.png)
-    
+<figure style="text-align: center; width: 80%; margin: 20px auto;">
+    <img src="rdkit_molecule_2d_profiling_files/rdkit_molecule_2d_profiling_8_0.png"
+         alt="2D structure of sulfadiazine sodium with Na ion"
+         style="display: block; margin: 0 auto; width: auto; max-width: 150px;">
+    <figcaption style="text-align: center;">
+        <strong>Figure 1:</strong> Initial 2D chemical structure of sulfadiazine sodium salt drawn using ACS1996 style guidelines in RDKit. The sodium counterion and negative charge are visible in this representation.
+    </figcaption>
+</figure>
 
-### **5. Process the molecule object**
+
+### **5. Process the molecule object** {#process-molecule}
 Molecular standardization represents one of the most critical steps in cheminformatics. Three key processing steps are implemented here:
 
 **Sanitization**
@@ -488,11 +494,19 @@ largest_frag_app.chooseInPlace(mol)
 uncharge_app.unchargeInPlace(mol)
 show_acs1996(mol, legend=id)
 ```
-    
-![png](rdkit_molecule_2d_profiling_files/rdkit_molecule_2d_profiling_10_0.png)
-    
+<figure style="text-align: center; width: 80%; margin: 20px auto;">
+    <img src="rdkit_molecule_2d_profiling_files/rdkit_molecule_2d_profiling_10_0.png" 
+         alt="Processed 2D structure of sulfadiazine"
+         style="display: block; margin: 0 auto; width: auto; max-width: 150px;">
+    <figcaption style="text-align: center;">
+        <strong>Figure 2:</strong> Standardized 2D chemical structure of sulfadiazine after processing. 
+        The sodium counterion has been removed and the molecule has been neutralized, resulting in the 
+        parent drug structure.
+    </figcaption>
+</figure>
 
-### **6. Calculate RDKit molecular descriptors**
+
+### **6. Calculate RDKit molecular descriptors** {#calculate-descriptors}
 RDKit has a lot of molecular descriptors, in fact, 217 at the writing of this post. The descriptors functions can be accessed from the `Descriptors` app in the `rdkit.Chem` module. Then looping through the `_descList` dictionary, all the descriptors can be calculated for each molecule. Subsets of descriptors can be calculated, if specific descriptors are needed.
 
 ```python
@@ -731,7 +745,7 @@ descriptors
 </div>
 
 
-### **7. Loop through all molecules and merge descriptors with original dataframe**
+### **7. Loop through all molecules and merge descriptors with original dataframe** {#loop-molecules}
 The final two cells show how to bring the previous steps together in a loop to process all the molecules in the dataset and merge the calculated descriptors with the original dataset.  If SMILES are missing, the program skips them.
 
 The try/except pattern is crucial because SMILES strings from public databases may fail to parse correctly. When processing thousands of molecules, robust error handling prevents pipeline failures due to individual problematic structures.
@@ -2487,6 +2501,6 @@ df.head()
 </div>
 
 
-## Conclusion
+## Conclusion {#conclusion}
 
 In this tutorial, we've covered essential techniques for standardizing and analyzing chemical structures with RDKit. From SMILES processing to molecular standardization (sanitization, salt removal, and charge neutralization) to descriptor calculation. These approaches ensure consistency across chemical datasets, enabling reliable property predictions and comparisons critical for drug discovery applications.
