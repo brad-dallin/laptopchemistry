@@ -6,7 +6,7 @@ author: Brad Dallin
 catagories: methods
 ---
 
-In this step-by-step guide, I'll show you how to build a SQL query to extract chemical structures and drug data from the ChEMBL database. As a valuable resource for drug discovery and cheminformatics research, ChEMBL contains extensive information on bioactive molecules. This tutorial assumes some basic familiarity with SQL and Python. The jupyter notebook for this methods post can be found [here](https://github.com/brad-dallin/laptopchemistry/blob/main/notebooks/qry_chembl_approved_small_molecule_drugs.ipynb).
+In this step-by-step guide, I'll show you how to build a SQL query to extract chemical structures and drug data from the ChEMBL database. As a valuable resource for drug discovery and cheminformatics research, ChEMBL contains extensive information on bioactive molecules. This tutorial assumes some basic familiarity with `SQL` and `Python`. The Jupyter notebook for this methods post can be found [here](https://github.com/brad-dallin/laptopchemistry/blob/main/notebooks/qry_chembl_approved_small_molecule_drugs.ipynb).
 
 ## Overview
 - [Setting Up Your Environment](#setup)
@@ -71,7 +71,7 @@ pg_restore --verbose --no-owner --host=localhost --port=5432 --username=postgres
 
 ### **Python Environment Setup** {#python-setup}
 
-For this tutorial, we'll use the `adbc_driver_postgresql` module for database connectivity and pandas for data manipulation. Install these packages using conda, preferably in a clean environment. I installed these within my RDKit environment.
+For this tutorial, we'll use the `adbc_driver_postgresql` module for database connectivity and `pandas` for data manipulation. Install these packages using conda, preferably in a clean environment. I installed these within my RDKit environment.
 
 ```python
 # Create RDKit conda environment
@@ -84,7 +84,7 @@ conda install conda-forge::adbc-driver-postgresql
 conda install conda-forge::pyarrow
 ```
 
-The `psycopg2` module can also be used, if you prefer. Although, the `adbc_driver_postgresql` module provides a more modern interface compared to `psycopg2` and integrates well with pandas for data analysis workflow, see [here](https://pandas.pydata.org/docs/reference/api/pandas.read_sql.html).
+The `psycopg2` module can also be used, if you prefer. Although, the `adbc_driver_postgresql` module provides a more modern interface compared to `psycopg2` and integrates well with `pandas` for data analysis workflow, see [here](https://pandas.pydata.org/docs/reference/api/pandas.read_sql.html).
 
 Now that our environment is ready, let's proceed to connect to the database and start exploring the ChEMBL data structure.
 
