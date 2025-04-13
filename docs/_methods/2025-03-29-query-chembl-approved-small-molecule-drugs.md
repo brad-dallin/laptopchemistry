@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "How to Query ChEMBL Database for Approved Small Molecule Drugs: A Step-by-Step Guide"
+title: "How to Query ChEMBL Database for Approved Small Molecule Drugs"
 description: "Learn how to query the ChEMBL database for approved small molecule drugs using SQL and Python. Complete tutorial with code examples for cheminformatics researchers and data scientists."
 author: Brad Dallin
 catagories: methods
