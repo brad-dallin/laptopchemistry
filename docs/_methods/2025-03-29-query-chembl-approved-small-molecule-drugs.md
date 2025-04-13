@@ -50,7 +50,6 @@ This process can take some time depending on your system specifications.
 
 ```python
 # Create new database
-dropdb chembl35
 createdb chembl35
 pg_restore --verbose --no-owner --host=localhost --port=5432 --username=postgres --dbname=chembl35 {PATHTO}/chembl_35_postgresql.dmp
 ```
