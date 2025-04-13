@@ -6,7 +6,7 @@ author: Brad Dallin
 catagories: methods
 ---
 
-In this step-by-step guide, I'll show you how to build a SQL query to extract chemical structures and drug data from the ChEMBL database. As a valuable resource for drug discovery and cheminformatics research, ChEMBL contains extensive information on bioactive molecules. This tutorial assumes some basic familiarity with SQL and Python.
+In this step-by-step guide, I'll show you how to build a SQL query to extract chemical structures and drug data from the ChEMBL database. As a valuable resource for drug discovery and cheminformatics research, ChEMBL contains extensive information on bioactive molecules. This tutorial assumes some basic familiarity with SQL and Python. The jupyter notebook for this methods post can be found [here](https://github.com/brad-dallin/laptopchemistry/blob/main/notebooks/qry_chembl_approved_small_molecule_drugs.ipynb).
 
 ## Overview
 - [Setting Up Your Environment](#setup)
