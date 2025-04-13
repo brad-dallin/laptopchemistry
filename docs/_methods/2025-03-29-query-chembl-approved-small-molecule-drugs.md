@@ -8,7 +8,21 @@ catagories: methods
 
 In this step-by-step guide, I'll show you how to build a SQL query to extract chemical structures and drug data from the ChEMBL database. As a valuable resource for drug discovery and cheminformatics research, ChEMBL contains extensive information on bioactive molecules. This tutorial assumes some basic familiarity with SQL and Python.
 
-## **0. Setting Up Your Environment**
+## Overview
+- [Setting Up Your Environment](#setup)
+    - [Installing the ChEMBL Database](#install-chembl)
+    - [Create a new database for ChEMBL](#create-chembldb)
+    - [Python Environment Setup](#python-setup)
+- [Import modules](#import-modules)
+- [Test Connection to PostgreSQL](#test-connection)
+- [Preview All Available Tables](#preview-tables)
+- [Preview Compound Structures Columns](#compound-structures)
+- [Preview Molecule Dictionary Columns](#molecule-dictionary)
+- [Preview Compound Properties Columns](#compound-properties)
+- [Query and Merge Tables](#query-merge)
+- [Conclusion](#conclusion)
+
+## **0. Setting Up Your Environment** {#setup}
 
 Before querying the ChEMBL database, you'll need to set up your environment properly. This section covers the prerequisite installations and configurations needed to follow this tutorial.
 
@@ -22,7 +36,7 @@ PostgreSQL: A running PostgreSQL server (I used Postgres App for Mac)
 Python 3.7+: With necessary libraries for database connection and data manipulation
 
 
-### **Installing the ChEMBL Database**
+### **Installing the ChEMBL Database** {#install-chembldb}
 
 The ChEMBL database is a comprehensive resource of bioactive molecules with drug-like properties. To download and install:
 
@@ -45,7 +59,7 @@ curl -JOfSL --output-dir {DOWNLOAD_PATH} https://ftp.ebi.ac.uk/pub/databases/che
 tar -xzvf chembl_35_postgresql.tar.gz
 ```
 
-### **Create a new database for ChEMBL**
+### **Create a new database for ChEMBL** {#create-chembldb}
 This process can take some time depending on your system specifications.
 
 ```python
@@ -55,7 +69,7 @@ pg_restore --verbose --no-owner --host=localhost --port=5432 --username=postgres
 ```
 
 
-### **Python Environment Setup**
+### **Python Environment Setup** {#python-setup}
 
 For this tutorial, we'll use the adbc_driver_postgresql module for database connectivity and pandas for data manipulation. Install these packages using conda, preferably in a clean environment. I installed these within my RDKit environment.
 
@@ -75,7 +89,7 @@ The psycopg2 module can also be used, if you prefer. Although, the adbc_driver_p
 Now that our environment is ready, let's proceed to connect to the database and start exploring the ChEMBL data structure.
 
 
-## **1. Import modules**
+## **1. Import modules** {#import-modules}
 
 Import pandas and adbc_driver_postgresql. By default, pandas truncates the number of columns printed. I adjusted the max column setting to print all columns.
 
@@ -96,7 +110,7 @@ print(f"ADBC Driver Version: {adbc_driver_postgresql.__version__}")
     ADBC Driver Version: 1.5.0
 
 
-## 2. **Test Connection to PostgreSQL**
+## 2. **Test Connection to PostgreSQL** {#test-connection}
 
 Set the URI hosting the ChEMBL database to localhost. Then use a basic SQL query to test the connection to the database.
 
@@ -114,7 +128,7 @@ except:
     Database connected successfully
 
 
-## 3. **Preview All Available Tables in ChEMBL Database**
+## 3. **Preview All Available Tables in ChEMBL Database** {#preview-tables}
 
 The ChEMBL database contains a lot of data which has been split into tables. You will often need to query and merge multiple tables to get all the data needed. Run the query below to list all the available tables in the database.
 
@@ -159,7 +173,7 @@ print(chembl_tables_df["table_name"].values)
      'usan_stems' 'variant_sequences' 'version' 'warning_refs']
 
 
-## 4. **Preview All Columns in Compound Structures Table**
+## 4. **Preview All Columns in Compound Structures Table** {#compound-structures}
 
 Run this query to see which columns are available in the compound structures table. Canonical SMILES are also available in this table.
 
@@ -185,7 +199,7 @@ print(f"Columns: {chembl_columns_df["column_name"].values}")
      'src_compound_id' 'cidx']
 
 
-## 5. **Preview All Columns in Molecule Dictionary**
+## 5. **Preview All Columns in Molecule Dictionary** {#molecule-dictionary}
 
 Run this query to see which columns are available in the molecule dictionary table, I ran this query. The molecule dictionary table contains much of the drug information data.
 
@@ -216,7 +230,7 @@ print(f"Columns: {chembl_columns_df["column_name"].values}")
      'chemical_probe' 'orphan']
 
 
-## 6. **Preview All Columns in Compound Properties**
+## 6. **Preview All Columns in Compound Properties** {#compound-properties}
 
 Run this query to see which columns are available in the compound properties table. Compound properties are mostly the physicochemical properties of the molecule.
 
@@ -245,7 +259,7 @@ print(f"Columns: {chembl_columns_df["column_name"].values}")
      'hbd_lipinski' 'num_lipinski_ro5_violations' 'np_likeness_score']
 
 
-## 7. **Query ChEMBL Database for Small Molecule Drugs and Merge Tables**
+## 7. **Query ChEMBL Database for Small Molecule Drugs and Merge Tables** {#query-merge}
 
 You can take the information about the columns above and combine it into a query/filter for small molecule drugs. It may be a little excessive to include all columns, but this is how you could keep all the data in view. It’s often easier to filter data later, rather than go back to retrieve or generate the data again. Uncomment chembl_df.to_csv command and add a file path to save the data to file.
 
@@ -653,6 +667,6 @@ chembl_df.head()
 </div>
 
 
-## **Conclusion and Next Steps**
+## **Conclusion and Next Steps** {#conclusion}
 
 This tutorial demonstrated how to query the ChEMBL database for approved small molecule drugs by merging multiple tables. The resulting dataset provides information including structures, physicochemical properties, and drug classification data. For more information on processing the data with RDKit, check out my that post [here]( https://brad-dallin.github.io/laptopchemistry/methods/2025-04-07-molecule-2d-profiling-rdkit.html) and watch for future posts exploring how to analyze this data for drug discovery applications and structure-activity relationship studies.
