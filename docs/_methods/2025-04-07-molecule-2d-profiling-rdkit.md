@@ -1,14 +1,27 @@
 ---
 layout: post
-title: Molecule 2D Profiling with RDKit
+title: "How to Standardize and Profile Chemical Structures with RDKit"
+description: "Learn how to standardize and analyze chemical structures using RDKit's Python API. Step-by-step tutorial on molecule processing, descriptor calculation, and more for cheminformatics workflows."
 author: Brad Dallin
 catagories: methods
 ---
 
-In this Methods post, I wanted to document a few tricks for processing/profiling chemical data with RDKit. Chemical datasets often come from a variety of sources and formats. It is often best, if not standard, practice to process and standardize the structures before moving on to more intense modeling tasks. Prior to running, I have created a conda environment with RDKit installed (see [here](https://www.rdkit.org/docs/Install.html)) and retrieved small molecule data from ChEMBL [here](https://brad-dallin.github.io/laptopchemistry/methods/2025-03-29-query-chembl-approved-small-molecule-drugs.html). The jupyter notebook for this methods post can be found [here](https://github.com/brad-dallin/laptopchemistry/blob/main/notebooks/rdkit_molecule_2d_profiling.ipynb)
+Chemical structure standardization and descriptor calculation are foundational steps in modern drug discovery pipelines and computational chemistry workflows. In this guide, I'll demonstrate essential techniques for processing, standardizing, and calculating molecular descriptors using RDKit—a powerful open-source cheminformatics toolkit widely adopted in pharmaceutical research and computational chemistry.
+
+Computational chemists, medicinal chemists, and cheminformaticians frequently face challenges when handling molecular data from diverse sources. Variations in representation, salt forms, ionization states, and structural encoding can significantly impact downstream analyses such as QSAR modeling, virtual screening, and molecular docking. This tutorial addresses these challenges by providing a systematic approach to chemical data standardization—ensuring consistency and reproducibility across molecular datasets.
+
+Building on my [previous post](https://brad-dallin.github.io/laptopchemistry/methods/2025-03-29-query-chembl-approved-small-molecule-drugs.html) about ChEMBL data retrieval, I'll show you how to efficiently process SMILES strings, implement a molecular preparation techniques, and calculate molecular descriptors critical for structure-property relationship studies and drug-likeness assessment. You'll learn practical RDKit functions for handling salt stripping, charge neutralization, and molecular feature extraction that can be integrated into Python-based cheminformatics pipelines.
+
+This tutorial assumes basic familiarity with Python programming and chemical structure representation, making it ideal for computational chemists, pharmaceutical researchers, and data scientists working with chemical datasets.
+
+I’ll be using a RDKit python environment I previously [created](https://brad-dallin.github.io/laptopchemistry/methods/2025-03-29-query-chembl-approved-small-molecule-drugs.html#python-setup) or see the [RDKit documentation](https://www.rdkit.org/docs/Install.html) for more details. The jupyter notebook for this methods post can be found [here](https://github.com/brad-dallin/laptopchemistry/blob/main/notebooks/rdkit_molecule_2d_profiling.ipynb).
+
 
 ### **1. Import modules**
-To process the molecules, I used RDKit and Pandas. Pandas by default will truncate the number of displayed rows. I set the Pandas display option to max columns. Much of RDKit is done at the C++ level, including logging. To suppress excessive output, I have I disabled logging. Comment this line for debugging. Versions are also printed.
+
+Import `os`, `pandas`, and `rdkit` modules. `Descriptors` for calculating molecular descriptors and `rdMolStandardize` for molecule standardization are imported from `rdkit.Chem`.
+
+Pandas display settings are adjusted to show all columns, and RDKit logging is suppressed to reduce excessive output. Finally, the versions of Pandas and RDKit are printed.
 
 ```python
 # Import modules
@@ -33,7 +46,10 @@ print(f"RDKit Version: {rdkit.__version__}")
 
 
 ### **2. Create ACS 1996 drawing function**
-This is personal preference for viewing 2D chemical structures.
+
+This is my personal preference for viewing 2D chemical structures and completely optional.
+
+This function creates a publication-quality 2D visualization of a chemical structure using the American Chemical Society's 1996 style guidelines. It processes an RDKit molecule object by computing optimal 2D coordinates, applying professional styling parameters, and returning a ready-to-display image. The result is a standardized chemical structure representation.
 
 ```python
 # Draw molecules in ACS1996 format
@@ -49,8 +65,9 @@ def show_acs1996(mol, legend=""):
     return Image.open(bio)
 ```
 
+
 ### **3. Load dataset**
-The dataset used can be found in the notebooks folder of this repository [here](https://github.com/brad-dallin/laptopchemistry/tree/main/notebooks/data). Pandas is used to load the CSV file.
+Load the CSV file as a Pandas dataframe. The dataset used can be found in the notebooks folder of this repository [here](https://github.com/brad-dallin/laptopchemistry/blob/main/notebooks/data/chembl_approved_small_molecule_drugs.csv).
 
 ```python
 # Paths
@@ -70,11 +87,9 @@ df.head()
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
-
     .dataframe tbody tr th {
         vertical-align: top;
     }
-
     .dataframe thead th {
         text-align: right;
     }
@@ -425,51 +440,60 @@ df.head()
 
 
 ### **4. Read in a molecule with RDKit**
-Before looping through all the molecules, let’s look at an example ensure processing does to the molecule what we expect. RDKit is used to read the SMILES string and try/exception is used to catch any errors. The loaded molecule is printed.
+
+Start by reading a single SMILES in with RDKit's `MolFromSmiles()` function. This function parses the SMILES string, then constructs a graph-based molecular representation. We'll take a look at the 11th entry, sulfadiazine sodium, which is an antibacterial drug administered as a sodium salt used to treat various bacterial infections and happens to be a nice example to demonstrate the standardization process.
 
 ```python
-# Read SMILES on row 10
+# Read SMILES
 ii = 10
 smi = df["smiles"].iloc[ii]
 id = df["pref_name"].iloc[ii]
-try:
-    mol = rdkit.Chem.MolFromSmiles(
-        smi,
-        sanitize = False
-    )
-    assert mol is not None
-except Exception as e:
-    if pd.notna(smi):
-        print(f"Error processing SMILES at index {ii}: {smi}")
-        print(f"Exception: {e}")
+mol = rdkit.Chem.MolFromSmiles(
+    smi,
+    sanitize = False
+)
 show_acs1996(mol, legend=id)
 ```
     
-![png](rdkit_molecule_2d_profiling_files/rdkit_molecule_2d_profiling_7_0.png)
+![png](rdkit_molecule_2d_profiling_files/rdkit_molecule_2d_profiling_8_0.png)
     
 
 ### **5. Process the molecule object**
-Processing the molecule involves three steps: sanitizing, extracting the largest fragment, and uncharging. Sanitization involves multiple RDKit steps (see the [RDKit book](https://www.rdkit.org/docs/RDKit_Book.html#molecular-sanitization)). The largest fragment and uncharging RDKit apps are used to carry out the other two steps. Uncharging is optional, although it can be useful to start with molecules in their neutral ionization state. The processed molecule is printed. Notice the proton on the sulfonamide nitrogen and the sodium ion is removed.
+Molecular standardization represents one of the most critical steps in cheminformatics. Three key processing steps are implemented here:
+
+**Sanitization**
+
+This step involves cleaning up the molecule and checking chemical consistency (*e.g.*, valence, kekulize, etc.). See the [RDKit book](https://www.rdkit.org/docs/RDKit_Book.html#molecular-sanitization) for details.
+
+Without proper sanitization, downstream calculations may produce nonsensical results or fail entirely. RDKit's sanitization is particularly thorough.
+
+**Largest Fragment Extraction** 
+
+This step addresses an important challenge in chemical datasets: many entries represent salts or mixtures rather than single compounds. The `LargestFragmentChooser()` and `chooseInPlace()` function analyzes the molecular graph to identify disconnected components, returning the largest connected subgraph. In our example, this removes the Na ion.
+
+**Neutralization (uncharging)**
+
+This step standardizes the ionization state of molecules, which can vary significantly depending on the source database and pH assumptions.
+
+This step is particularly important when calculating physicochemical descriptors that depend on ionization state, such as logP values. However, it should be applied cautiously, as bioactive conformations may require specific charge states for receptor binding.
+
+Compare the molecule images below to the one above to see the ion and charge neutralized.
 
 ```python
-# Extract largest fragment and uncharge
+# Sanitize, extract the largest fragment, and uncharge
+rdkit.Chem.SanitizeMol(mol)
 largest_frag_app = rdMolStandardize.LargestFragmentChooser()
 uncharge_app = rdMolStandardize.Uncharger()
-try:
-    rdkit.Chem.SanitizeMol(mol)
-    largest_frag_app.chooseInPlace(mol)
-    uncharge_app.unchargeInPlace(mol)
-except Exception as e:
-    print(f"Error processing molecule at index {ii}")
-    print(f"Exception: {e}")
+largest_frag_app.chooseInPlace(mol)
+uncharge_app.unchargeInPlace(mol)
 show_acs1996(mol, legend=id)
 ```
     
-![png](rdkit_molecule_2d_profiling_files/rdkit_molecule_2d_profiling_9_0.png)
+![png](rdkit_molecule_2d_profiling_files/rdkit_molecule_2d_profiling_10_0.png)
     
 
 ### **6. Calculate RDKit molecular descriptors**
-RDKit has a lot of molecular descriptors, in fact, 217 at the writing of this post. The descriptors functions can be accessed from the Descriptors app in the rdkit.Chem module. Then looping through the _descList dictionary, all the descriptors can be calculated for each molecule. Subsets of descriptors can be calculated, if specific descriptors are needed.
+RDKit has a lot of molecular descriptors, in fact, 217 at the writing of this post. The descriptors functions can be accessed from the `Descriptors` app in the `rdkit.Chem` module. Then looping through the `_descList` dictionary, all the descriptors can be calculated for each molecule. Subsets of descriptors can be calculated, if specific descriptors are needed.
 
 ```python
 # Calculate all RDKit descriptors
@@ -706,14 +730,18 @@ descriptors
      'fr_urea': 0}
 </div>
 
-### **7. Loop through all molecules and merge descriptors with original dataframe
+
+### **7. Loop through all molecules and merge descriptors with original dataframe**
 The final two cells show how to bring the previous steps together in a loop to process all the molecules in the dataset and merge the calculated descriptors with the original dataset.  If SMILES are missing, the program skips them.
+
+The try/except pattern is crucial because SMILES strings from public databases may fail to parse correctly. When processing thousands of molecules, robust error handling prevents pipeline failures due to individual problematic structures.
 
 ```python
 # Run for all compounds
 largest_frag_app = rdMolStandardize.LargestFragmentChooser()
 uncharge_app = rdMolStandardize.Uncharger()
 mols = []
+unique_smiles = []
 skipped_indices = []
 for ii, smi in enumerate(df["smiles"]):
     try:
@@ -737,9 +765,13 @@ for ii, smi in enumerate(df["smiles"]):
         print(f"Error processing molecule at index {ii}")
         print(f"Exception: {e}")
         continue
+    frag_smi = rdkit.Chem.MolToSmiles(mol)
+    if frag_smi in unique_smiles:
+        skipped_indices.append(ii)
+        continue
     descriptors = {
         "idx": ii,
-        "SMILES": rdkit.Chem.MolToSmiles(mol),
+        "SMILES": frag_smi,
     }
     for descriptor, fxn in Descriptors._descList:
         try:
@@ -748,12 +780,13 @@ for ii, smi in enumerate(df["smiles"]):
             value = None
         descriptors[f"rdkit_{descriptor}"] = value
     mols.append(descriptors)
+    unique_smiles.append(frag_smi)
 
 print(f"{len(mols)}/{df.shape[0]} molecules processed!")
 print(f"{df.shape[0]-len(mols)}/{df.shape[0]} molecules skipped!")
 ```
-    3382/3517 molecules processed!
-    135/3517 molecules skipped!
+    2292/3517 molecules processed!
+    1225/3517 molecules skipped!
 
 
 ```python
@@ -773,22 +806,30 @@ cols.remove('SMILES')
 cols.insert(0, 'SMILES')
 df = df[cols]
 
+# Drop skipped indices
+df = df.drop(index=skipped_indices)
+
 # Display results
 print(df.shape)
 df.head()
+# Save to file
+# df.to_csv(
+#     args.output,
+#     index=False,
+#     encoding="utf-8"
+# )
 ```
-    (3517, 271)
+    (2292, 271)
+
 
 <div style="overflow-x: auto; width: 100%;">
 <style scoped>
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
-
     .dataframe tbody tr th {
         vertical-align: top;
     }
-
     .dataframe thead th {
         text-align: right;
     }
@@ -1178,7 +1219,7 @@ df.head()
       <td>6.606882</td>
       <td>11.566490</td>
       <td>0.000000</td>
-      <td>0.0</td>
+      <td>0.000000</td>
       <td>5.969305</td>
       <td>14.383612</td>
       <td>0.000000</td>
@@ -1231,7 +1272,7 @@ df.head()
       <td>0.00000</td>
       <td>10.110728</td>
       <td>6.001849</td>
-      <td>0.0</td>
+      <td>0.000000</td>
       <td>0.782609</td>
       <td>27.0</td>
       <td>0.0</td>
@@ -1452,7 +1493,7 @@ df.head()
       <td>0.000000</td>
       <td>5.959555</td>
       <td>0.000000</td>
-      <td>0.0</td>
+      <td>0.000000</td>
       <td>0.000000</td>
       <td>5.409284</td>
       <td>0.000000</td>
@@ -1505,7 +1546,7 @@ df.head()
       <td>0.00000</td>
       <td>0.000000</td>
       <td>0.000000</td>
-      <td>0.0</td>
+      <td>0.000000</td>
       <td>0.000000</td>
       <td>4.0</td>
       <td>5.0</td>
@@ -1726,7 +1767,7 @@ df.head()
       <td>5.414990</td>
       <td>0.000000</td>
       <td>11.814359</td>
-      <td>0.0</td>
+      <td>0.000000</td>
       <td>6.031115</td>
       <td>20.222652</td>
       <td>4.794537</td>
@@ -1779,7 +1820,7 @@ df.head()
       <td>-0.72465</td>
       <td>1.106968</td>
       <td>5.540314</td>
-      <td>0.0</td>
+      <td>0.000000</td>
       <td>0.700000</td>
       <td>15.0</td>
       <td>2.0</td>
@@ -2000,7 +2041,7 @@ df.head()
       <td>0.000000</td>
       <td>0.000000</td>
       <td>0.000000</td>
-      <td>0.0</td>
+      <td>0.000000</td>
       <td>0.000000</td>
       <td>0.000000</td>
       <td>4.983979</td>
@@ -2053,7 +2094,7 @@ df.head()
       <td>0.00000</td>
       <td>4.376343</td>
       <td>0.671481</td>
-      <td>0.0</td>
+      <td>0.000000</td>
       <td>0.400000</td>
       <td>8.0</td>
       <td>3.0</td>
@@ -2168,17 +2209,17 @@ df.head()
       <td>0.0</td>
     </tr>
     <tr>
-      <th>4</th>
-      <td>CCC(C)C1(CC)C(=O)NC(=O)NC1=O</td>
-      <td>CHEMBL449</td>
-      <td>CCC(C)C1(CC)C(=O)NC(=O)NC1=O</td>
-      <td>2393</td>
-      <td>BUTABARBITAL</td>
+      <th>5</th>
+      <td>Nc1ccc(S(=O)(=O)Nc2ccccn2)cc1</td>
+      <td>CHEMBL700</td>
+      <td>Nc1ccc(S(=O)(=O)Nc2ccccn2)cc1</td>
+      <td>32842</td>
+      <td>SULFAPYRIDINE</td>
       <td>4.0</td>
       <td>1</td>
-      <td>0</td>
+      <td>1</td>
       <td>MOL</td>
-      <td>3228.0</td>
+      <td>132842.0</td>
       <td>Small molecule</td>
       <td>1939.0</td>
       <td>1</td>
@@ -2187,211 +2228,192 @@ df.head()
       <td>0</td>
       <td>1</td>
       <td>0</td>
-      <td>0</td>
+      <td>2</td>
       <td>0</td>
       <td>0</td>
       <td>NaN</td>
-      <td>1.0</td>
-      <td>-barb-</td>
+      <td>0.0</td>
+      <td>sulfa-</td>
       <td>0</td>
-      <td>-barb-</td>
-      <td>barbituric acid derivatives</td>
-      <td>Sedative-Hypnotic</td>
+      <td>sulfa-</td>
+      <td>antimicrobials (sulfonamides derivatives)</td>
+      <td>Suppressant (dermatitis herpetiformis)</td>
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>212.25</td>
-      <td>0.79</td>
-      <td>3.0</td>
+      <td>249.30</td>
+      <td>1.46</td>
+      <td>4.0</td>
       <td>2.0</td>
-      <td>75.27</td>
+      <td>85.08</td>
       <td>3.0</td>
       <td>N</td>
       <td>0.0</td>
-      <td>7.48</td>
-      <td>NaN</td>
-      <td>1.45</td>
-      <td>1.19</td>
-      <td>NEUTRAL</td>
-      <td>212.25</td>
-      <td>0.0</td>
-      <td>15.0</td>
-      <td>0.68</td>
-      <td>212.1161</td>
-      <td>C10H16N2O3</td>
+      <td>6.24</td>
+      <td>2.14</td>
+      <td>1.01</td>
+      <td>0.24</td>
+      <td>ACID</td>
+      <td>249.30</td>
+      <td>2.0</td>
+      <td>17.0</td>
+      <td>0.81</td>
+      <td>249.0572</td>
+      <td>C11H11N3O2S</td>
       <td>5.0</td>
-      <td>2.0</td>
+      <td>3.0</td>
       <td>0.0</td>
-      <td>0.32</td>
-      <td>11.775694</td>
-      <td>11.775694</td>
-      <td>0.087407</td>
-      <td>-1.094583</td>
-      <td>0.679143</td>
-      <td>21.933333</td>
-      <td>212.249</td>
-      <td>196.121</td>
-      <td>212.116092</td>
-      <td>84.0</td>
+      <td>-1.63</td>
+      <td>11.920950</td>
+      <td>11.920950</td>
+      <td>0.150327</td>
+      <td>-3.598148</td>
+      <td>0.806426</td>
+      <td>11.058824</td>
+      <td>249.295</td>
+      <td>238.207</td>
+      <td>249.057198</td>
+      <td>88.0</td>
       <td>0.0</td>
-      <td>0.327632</td>
-      <td>-0.276814</td>
-      <td>0.327632</td>
-      <td>0.276814</td>
-      <td>1.133333</td>
-      <td>1.600000</td>
-      <td>1.933333</td>
-      <td>16.197656</td>
-      <td>9.702763</td>
-      <td>2.513510</td>
-      <td>-2.368754</td>
-      <td>2.352530</td>
-      <td>-2.638437</td>
-      <td>6.188352</td>
-      <td>-0.148048</td>
-      <td>2.169489</td>
-      <td>3.105335</td>
-      <td>291.789362</td>
-      <td>11.637828</td>
-      <td>9.216309</td>
-      <td>9.216309</td>
-      <td>6.984435</td>
-      <td>5.154413</td>
-      <td>5.154413</td>
-      <td>3.871574</td>
-      <td>3.871574</td>
-      <td>3.275800</td>
-      <td>3.275800</td>
-      <td>2.029272</td>
-      <td>2.029272</td>
-      <td>-1.39</td>
-      <td>1.757286e+03</td>
-      <td>11.683475</td>
-      <td>4.001507</td>
-      <td>1.619083</td>
-      <td>88.602190</td>
-      <td>0.000000</td>
-      <td>5.414990</td>
-      <td>0.000000</td>
-      <td>11.814359</td>
-      <td>0.0</td>
-      <td>6.031115</td>
-      <td>20.222652</td>
-      <td>4.794537</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>27.192033</td>
-      <td>12.338728</td>
+      <td>0.262547</td>
+      <td>-0.398728</td>
+      <td>0.398728</td>
+      <td>0.262547</td>
+      <td>1.058824</td>
+      <td>1.764706</td>
+      <td>2.352941</td>
+      <td>32.233271</td>
+      <td>10.319152</td>
+      <td>2.133279</td>
+      <td>-2.063880</td>
+      <td>2.146726</td>
+      <td>-2.131944</td>
+      <td>7.923180</td>
+      <td>0.600815</td>
+      <td>2.300312</td>
+      <td>2.285509</td>
+      <td>594.373487</td>
+      <td>12.303119</td>
+      <td>8.868111</td>
+      <td>9.684607</td>
+      <td>8.077317</td>
+      <td>4.872105</td>
+      <td>6.355268</td>
+      <td>3.389512</td>
+      <td>5.071915</td>
+      <td>2.094227</td>
+      <td>3.464862</td>
+      <td>1.266702</td>
+      <td>2.275017</td>
+      <td>-2.08</td>
+      <td>7.471415e+03</td>
+      <td>11.406730</td>
+      <td>4.423184</td>
+      <td>2.729239</td>
+      <td>99.358674</td>
+      <td>5.733667</td>
+      <td>5.817863</td>
       <td>0.000000</td>
       <td>0.000000</td>
-      <td>14.383612</td>
-      <td>17.845474</td>
+      <td>10.023291</td>
       <td>0.000000</td>
-      <td>10.633577</td>
-      <td>11.332897</td>
-      <td>33.612855</td>
+      <td>4.722095</td>
+      <td>13.401776</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>6.066367</td>
+      <td>36.398202</td>
+      <td>11.884230</td>
+      <td>4.895483</td>
+      <td>8.417797</td>
+      <td>21.528540</td>
       <td>0.000000</td>
+      <td>4.983979</td>
       <td>0.000000</td>
+      <td>4.895483</td>
+      <td>10.455762</td>
+      <td>48.661413</td>
       <td>0.0</td>
       <td>0.0</td>
-      <td>10.633577</td>
-      <td>4.794537</td>
+      <td>10.455762</td>
+      <td>11.505249</td>
       <td>0.0</td>
       <td>0.0</td>
-      <td>17.845474</td>
-      <td>9.589074</td>
-      <td>11.332897</td>
-      <td>33.612855</td>
-      <td>0.000000</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>75.27</td>
-      <td>23.260464</td>
-      <td>14.383612</td>
-      <td>0.0</td>
-      <td>5.917906</td>
-      <td>12.841643</td>
+      <td>13.401776</td>
+      <td>10.023291</td>
       <td>0.000000</td>
       <td>0.000000</td>
-      <td>6.923737</td>
-      <td>13.847474</td>
-      <td>10.633577</td>
-      <td>0.000000</td>
-      <td>0.000000</td>
+      <td>53.556897</td>
       <td>0.0</td>
-      <td>34.486026</td>
-      <td>4.313889</td>
-      <td>-1.094583</td>
-      <td>-1.044630</td>
-      <td>-0.72465</td>
-      <td>1.106968</td>
-      <td>5.540314</td>
       <td>0.0</td>
-      <td>0.700000</td>
-      <td>15.0</td>
-      <td>2.0</td>
+      <td>0.0</td>
+      <td>85.08</td>
+      <td>10.023291</td>
+      <td>8.417797</td>
+      <td>0.0</td>
+      <td>10.713346</td>
+      <td>5.687386</td>
+      <td>0.000000</td>
+      <td>30.462312</td>
+      <td>18.199101</td>
+      <td>0.000000</td>
+      <td>9.706073</td>
+      <td>5.733667</td>
+      <td>26.216196</td>
+      <td>0.0</td>
+      <td>4.042339</td>
+      <td>0.000000</td>
+      <td>6.010490</td>
+      <td>0.281782</td>
+      <td>10.94929</td>
+      <td>1.514717</td>
+      <td>0.000000</td>
+      <td>-3.598148</td>
+      <td>0.000000</td>
+      <td>17.0</td>
+      <td>3.0</td>
       <td>5.0</td>
       <td>0.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>4.0</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>1.0</td>
-      <td>0.0</td>
-      <td>3.0</td>
+      <td>1.0</td>
       <td>2.0</td>
-      <td>5.0</td>
-      <td>1.0</td>
-      <td>3.0</td>
-      <td>0.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>0.0</td>
-      <td>1.0</td>
-      <td>3.116767</td>
-      <td>1.0</td>
-      <td>0.79490</td>
-      <td>53.8604</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>3.0</td>
-      <td>3.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>2.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>4.0</td>
+      <td>2.0</td>
+      <td>6.0</td>
+      <td>1.0</td>
+      <td>3.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>2.967886</td>
+      <td>2.0</td>
+      <td>1.46460</td>
+      <td>65.8999</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>1.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
@@ -2408,6 +2430,14 @@ df.head()
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
@@ -2440,7 +2470,23 @@ df.head()
       <td>0.0</td>
       <td>0.0</td>
       <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
     </tr>
   </tbody>
 </table>
 </div>
+
+
+## Conclusion
+
+In this tutorial, we've covered essential techniques for standardizing and analyzing chemical structures with RDKit. From SMILES processing to molecular standardization (sanitization, salt removal, and charge neutralization) to descriptor calculation. These approaches ensure consistency across chemical datasets, enabling reliable property predictions and comparisons critical for drug discovery applications.
