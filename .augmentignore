@@ -1,0 +1,40 @@
+# Build and output directories
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+.bundle/
+vendor/
+
+# Large data files
+*.csv
+*.xlsx
+*.db
+*.sqlite
+*.h5
+*.hdf5
+*.npy
+*.npz
+
+# Large binary files
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.mp4
+*.zip
+
+# Dependency directories
+node_modules/
+venv/
+env/
+.venv/
+.env/
+
+# Cache and temporary files
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
