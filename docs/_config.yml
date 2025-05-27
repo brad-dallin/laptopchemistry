@@ -39,7 +39,6 @@ plugins:
 # Web Verification
 webmaster_verifications:
   google: 22adf0f0c4ae7864
-  google-site-verification=NwU9FIvZjv0DUTyReCee-xeqOFt5rHmYaYTib3GUVYU
   # bing: 
   # alexa: 
   # yandex: 
