@@ -2,7 +2,7 @@
 title: Laptop Chemistry
 author:
   name: Brad Dallin
-  email: bradley.dallin.phd@gmail.com
+  # email: bradley.dallin.phd@gmail.com
 description: >
   "My digital workspace for computational chemistry research,
   cheminformatics tools, and scientific computing projects.
@@ -72,8 +72,8 @@ minima:
   # * url      Full URL of social profile.
   social_links:
    - title: GitHub
-     icon: github
+     icon: fa-brands fa-github
      url: "https://github.com/brad-dallin"
    - title: LinkedIn
-     icon: linkedin
+     icon: fa-brands fa-linkedin
      url: "https://www.linkedin.com/in/bradley-dallin/"
